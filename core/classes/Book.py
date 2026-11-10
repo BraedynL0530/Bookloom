@@ -13,6 +13,7 @@ class Book:
         self.chapter_name = ""
         self.current_chapter = None
         self.last_viewed = None
+        self.cover_img_path = None
 
     def add_tag(self, tag):
         self.tags.append(tag)
@@ -23,7 +24,7 @@ class Book:
     def update_chapter(self, chapter):
         self.current_chapter = chapter
 
-    def update_chapters(self, chapters):
+    def update_chapters(self, chapters): #update on network finding new/newly uploaded files?
         self.chapters = chapters
 
     def update_last_viewed(self, last_viewed): # basically only going to me time.now
