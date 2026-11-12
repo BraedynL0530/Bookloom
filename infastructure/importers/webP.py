@@ -5,19 +5,24 @@ import requests
 from urllib.parse import urlparse, urljoin
 import zipfile
 
-
+#TODO: transfer to go in future
 def download_concurrent(url, concurrency=3):
     id = 0
     done = False
+    Book = None
     for i in range(concurrency):
         id += 1
-        download_chapter(url, id)
+        if Book:
+            download_chapter(url, id,Book)
+        else:
+            Book = download_chapter(url, id)
 
 
 
 
 
-def download_chapter(url, id=0):
+
+def download_chapter(url, book,id=0):
     agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
     Headers = {
         "User-Agent": agent,
@@ -25,13 +30,19 @@ def download_chapter(url, id=0):
     }
     title = "temp"  # fetch from url/something else
     index = id
-    output = f"{title}chapter {index}.cbz"
-    Book.new
+    output_path = f"{title}chapter {index}.cbz"
     soup = BS(requests.get(url, headers=Headers).content, "html.parser")
     imgs = find_manhwa_images_heuristically(soup, url)
     valid_exts = ['.jpg', '.jpeg', '.png', '.webp']
     if not imgs:
         return
+
+    if book.chapters:
+        book.chapters.append(output_path) #needs to be changed
+    else:
+        newBook = Book(title, output_path)
+        return newBook
+
 
 
 def clean_url(url, base_url: str):
