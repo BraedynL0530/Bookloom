@@ -29,9 +29,6 @@ class Bookshelf:
         #update current rows
         #other stuff
 
-
-
-
     def search_book(self, book:str) -> str: #title
         for i in self.books:
             if i.title == book:

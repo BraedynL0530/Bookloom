@@ -7,7 +7,7 @@ class Book:
         self.author = author
         self.tags = []
         self.description = "not found"
-        self.source = "file" #Qdefualt
+        self.source = "" #either web or local
         self.id = str(uuid.uuid4())
         self.chapters = []
         self.chapter_count = 0

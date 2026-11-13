@@ -1,124 +1,115 @@
-from core.classes.Book import Book
-from bs4 import BeautifulSoup as BS
 import os
-import requests
-from urllib.parse import urlparse, urljoin
+import io
+import uuid
 import zipfile
+from urllib.parse import urljoin
+from playwright.sync_api import sync_playwright
+from PIL import Image
 
-#TODO: transfer to go in future
-def download_concurrent(url, concurrency=3):
-    id = 0
-    done = False
-    Book = None
-    for i in range(concurrency):
-        id += 1
-        if Book:
-            download_chapter(url, id,Book)
-        else:
-            Book = download_chapter(url, id)
+#Go will call this to get concurent downloads!
 
+def download_chapter_to_cbz(url: str, output_path: str):
 
+    print(f"Initializing engine for: {url}")
 
+    with sync_playwright() as p:
+        browser = p.chromium.launch(headless=True)
+        context = browser.new_context(
+            user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+            viewport={"width": 1280, "height": 1920}
+        )
+        page = context.new_page()
 
+        try:
+            page.goto(url, wait_until="networkidle", timeout=45000)
 
-
-def download_chapter(url, book,id=0):
-    agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
-    Headers = {
-        "User-Agent": agent,
-        "referer": url
-    }
-    title = "temp"  # fetch from url/something else
-    index = id
-    output_path = f"{title}chapter {index}.cbz"
-    soup = BS(requests.get(url, headers=Headers).content, "html.parser")
-    imgs = find_manhwa_images_heuristically(soup, url)
-    valid_exts = ['.jpg', '.jpeg', '.png', '.webp']
-    if not imgs:
-        return
-
-    if book.chapters:
-        book.chapters.append(output_path) #needs to be changed
-    else:
-        newBook = Book(title, output_path)
-        return newBook
+            for _ in range(8):
+                page.evaluate("window.scrollBy(0, window.innerHeight * 1.5);")
+                page.wait_for_timeout(500)
 
 
+            if "mangaplus" in url.lower() or "shonenjumpplus" in url.lower():
+                print(" Manga Plus canvas engine detected. Extracting visual buffers...")
+                image_buffers = extract_manga_plus_canvases(page)
 
-def clean_url(url, base_url: str):
-    if not url:
-        return None
-    url = url.strip()
-    if url.startswith('//'):
-        return 'https:' + url
-    return urljoin(base_url, url)
+            else:
+                print("Standard image layout detected (Comix/Yaoiscan style).")
+                image_buffers = extract_standard_images(page, url)
+
+            if image_buffers:
+                save_buffers_to_cbz(image_buffers, output_path)
+                print(f"Successfully created: {output_path} ({len(image_buffers)} pages)")
+                return True
+            else:
+                print("No readable chapter frames were extracted.")
+                return False
+
+        except Exception as e:
+            print(f"Failed processing page frame: {e}")
+            return False
+        finally:
+            browser.close()
 
 
-def find_manhwa_images_heuristically(soup, base_url: str) -> list:
-    candidate_blocks = []
+def extract_standard_images(page, base_url: str) -> list:
+    urls = page.evaluate("""
+        () => {
+            const list = [];
+            document.querySelectorAll('img').forEach(img => {
+                const w = img.naturalWidth || img.clientWidth;
+                const h = img.naturalHeight || img.clientHeight;
+                // Skips avatars, ads, UI icons
+                if (w > 400 && h > 500) {
+                    const src = img.src || img.getAttribute('src');
+                    if (src && !src.startsWith('data:')) list.push(src);
+                }
+            });
+            return list;
+        }
+    """)
 
-    for element in soup.find_all(['div', 'section', 'article', 'main']):
-        imgs = element.find_all('img', recursive=False)
-        if len(imgs) < 3:
-            imgs = element.find_all('img')
-            if len(imgs) < 3:
-                continue
-
-        score = 0
-        valid_urls = []
-        domains = {}
-
-        for img in imgs:
-            src = img.get('data-src') or img.get('src') or img.get('data-lazy-src') or img.get('origin-src')
-            src = clean_url(src, base_url)
-
-            if not src:
-                continue
-
-            low_val_keywords = ['logo', 'banner', 'icon', 'avatar', 'loader', 'widget', 'ad', 'button']
-            if any(key in src.lower() for key in low_val_keywords):
-                score -= 10
-                continue
-
-            if any(ext in src.lower() for ext in ['.jpg', '.jpeg', '.png', '.webp']):
-                valid_urls.append(src)
-
-                domain = urlparse(src).netloc
-                domains[domain] = domains.get(domain, 0) + 1
-
-        if len(valid_urls) < 3:
+    buffers = []
+    for idx, src in enumerate([urljoin(base_url, u) for u in urls if u]):
+        try:
+            img_response = page.context.request.get(src, headers={"Referer": base_url})
+            if img_response.status == 200:
+                buffers.append(img_response.body())
+        except Exception:
             continue
+    return buffers
 
-        score += len(valid_urls) * 5
 
-        if domains:
-            primary_domain_count = max(domains.values())
-            if primary_domain_count / len(valid_urls) > 0.85:
-                score += 100
+def extract_manga_plus_canvases(page) -> list:
 
-        text_length = len(element.get_text(strip=True))
-        if text_length > 0:
-            text_to_img_ratio = text_length / len(valid_urls)
-            if text_to_img_ratio > 50:
-                score -= 50
+    base64_strings = page.evaluate("""
+        () => {
+            const frames = [];
+            document.querySelectorAll('canvas').forEach(canvas => {
+                // Ignore small interface sliders or loading wheels
+                if (canvas.width > 500) {
+                    frames.push(canvas.toDataURL('image/jpeg', 0.9));
+                }
+            });
+            return frames;
+        }
+    """)
 
-        attrs_string = " ".join([str(v) for v in element.attrs.values()]).lower()
-        if any(k in attrs_string for k in ['reader', 'chapter', 'vung-doc', 'images-go', 'comic-wrap']):
-            score += 40
+    import base64
+    buffers = []
+    for data_str in base64_strings:
+        if "," in data_str:
+            header, encoded = data_str.split(",", 1)
+            buffers.append(base64.b64decode(encoded))
+    return buffers
 
-        candidate_blocks.append({
-            'element': element,
-            'urls': valid_urls,
-            'score': score
-        })
 
-    if not candidate_blocks:
-        return []
-
-    candidate_blocks.sort(key=lambda x: x['score'], reverse=True)
-    best_candidate = candidate_blocks[0]
-
-    print(f"Selected target block with footprint score: {best_candidate['score']}")
-    return best_candidate['urls']
-
-# plugin file saving,
+def save_buffers_to_cbz(buffers: list, output_path: str):
+    with zipfile.ZipFile(output_path, 'w', zipfile.ZIP_DEFLATED) as cbz:
+        for idx, buf in enumerate(buffers):
+            try:
+                img = Image.open(io.BytesIO(buf))
+                ext = img.format.lower() if img.format else "jpeg"
+                filename = f"{idx + 1:03d}.{ext}"
+                cbz.writestr(filename, buf)
+            except Exception:
+                cbz.writestr(f"{idx + 1:03d}.jpg", buf)
