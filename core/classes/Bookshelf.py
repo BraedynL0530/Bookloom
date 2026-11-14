@@ -1,48 +1,51 @@
-from uuid import UUID
+import uuid
+from typing import Optional
+from sqlalchemy import String, Integer, JSON
+from sqlalchemy.orm import Mapped, mapped_column
+from infastructure.storage.storage import Base
 
+class Bookshelf(Base):
+    __tablename__ = "bookshelves"
 
-class Bookshelf:
-    def __init__(self):
-        self.books = [] #list of ids Books class will have data 4 display
-        self.books_per_row = 10 # idk default
-        self.order = None
-        self.favorite = [] #ids
-        self.current_rows = 1 #not visual editing rows but 4 layout(unless its over the image rows)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    books_per_row: Mapped[int] = mapped_column(Integer, default=10)
+    order: Mapped[Optional[str]] = mapped_column(String(50), nullable=True)
+    current_rows: Mapped[int] = mapped_column(Integer, default=1)
 
+    books: Mapped[list[str]] = mapped_column(JSON, default=list)
+    favorite: Mapped[list[str]] = mapped_column(JSON, default=list)
 
-    def add_book(self, book: UUID):
-        self.books.append(book)
-        self.update_shelf(book)
+    def add_book(self, book_id: uuid.UUID):
+        if not self.books:
+            self.books = []
+        self.books = self.books + [str(book_id)]
+        self.update_shelf()
 
+    def remove_book(self, book_id: uuid.UUID):
+        str_id = str(book_id)
+        if self.books and str_id in self.books:
+            self.books = [b for b in self.books if b != str_id]
+            self.update_shelf()
+
+    def update_shelf(self):
+        if not self.books:
+            self.current_rows = 1
+            return
+        self.current_rows = max(1, (len(self.books) + self.books_per_row - 1) // self.books_per_row)
+
+    def add_favorite(self, book_id: uuid.UUID):
+        if not self.favorite:
+            self.favorite = []
+        self.favorite = self.favorite + [str(book_id)]
+
+    def remove_favorite(self, book_id: uuid.UUID):
+        str_id = str(book_id)
+        if self.favorite and str_id in self.favorite:
+            self.favorite = [f for f in self.favorite if f != str_id]
+
+    def set_books_per_row(self, books_per_row: int):
+        self.books_per_row = books_per_row
+        self.update_shelf()
 
     def __len__(self):
-        return len(self.books)
-
-    def remove_book(self, book: UUID):
-        if book in self.books:
-            self.books.remove(book)
-            self.update_shelf(book)
-
-    def update_shelf(self, books:list):
-        return
-        #clac rows needed here
-        #update current rows
-        #other stuff
-
-    def search_book(self, book:str) -> str: #title
-        for i in self.books:
-            if i.title == book:
-                return i
-
-
-    def reorder_books(self, books):
-        return # ts should be like chapter ascending/de, or recents
-
-    def set_books_per_row(self, books_per_row):
-        self.books_per_row = books_per_row
-
-    def add_favorite(self, id):
-        self.favorite.append(id)
-
-    def remove_favorite(self, id):
-        self.favorite.remove(id)
+        return len(self.books) if self.books else 0
