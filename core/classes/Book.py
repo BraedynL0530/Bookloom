@@ -31,7 +31,7 @@ class Book(Base):
 
     def remove_tag(self, tag: str):
         if self.tags and tag in self.tags:
-            self.tags = [t for t in self.tags if t != tag]
+            self.tags = [t for t in self.tags if t!= tag]
 
     def update_chapter(self, chapter: str):
         self.current_chapter = chapter

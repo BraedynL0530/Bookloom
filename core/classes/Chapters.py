@@ -11,3 +11,4 @@ class Chapter(Base):
     title: Mapped[str] = mapped_column(String(255), nullable=False)
     book_id: Mapped[str] = mapped_column(ForeignKey("books.id", ondelete="CASCADE"), nullable=False)
     book: Mapped["Book"] = relationship(back_populates="chapters")
+    chapter_path: Mapped[str] = mapped_column(String(500), nullable=False)

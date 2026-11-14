@@ -9,4 +9,4 @@ class Signal:
         for func in self.listners:
             func(*args, **kwargs)
 
-#Usage, IDK likely gui class interface
+#this will be for updating gui not transfering outside data!
