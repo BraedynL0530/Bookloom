@@ -3,6 +3,7 @@ from typing import Optional
 from sqlalchemy import String, Integer, JSON
 from sqlalchemy.orm import Mapped, mapped_column
 from infastructure.storage.storage import Base
+from core.events.Signal import Signal
 
 class Bookshelf(Base):
     __tablename__ = "bookshelves"
@@ -32,6 +33,8 @@ class Bookshelf(Base):
             self.current_rows = 1
             return
         self.current_rows = max(1, (len(self.books) + self.books_per_row - 1) // self.books_per_row)
+        Signal.emit("update_shelf")
+
 
     def add_favorite(self, book_id: uuid.UUID):
         if not self.favorite:

@@ -4,7 +4,7 @@ from typing import Optional
 from sqlalchemy import String, JSON, DateTime
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from infastructure.storage.storage import Base
-
+from core.events.Signal import Signal
 
 class Book(Base):
     __tablename__ = "books"
@@ -35,9 +35,11 @@ class Book(Base):
 
     def update_chapter(self, chapter: str):
         self.current_chapter = chapter
+        Signal.emit("update_chapter")
 
     def update_chapters(self, chapters: list):
         self.chapters = chapters
+        Signal.emit("update_chapters") #may not want to use signal here but instead in import but well see!
 
     def update_last_viewed(self, last_viewed: datetime):
         self.last_viewed = last_viewed

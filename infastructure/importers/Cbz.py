@@ -19,14 +19,14 @@ def import_cbz(path, book_id: Optional[str] = None, book_chapter: Optional[float
 
         else:
             try:
-                Signal.emit("import_new_cbz")
                 Signal.connect(get_book_data, lambda title, author: (title, author))
                 book = Book(
                     title = "New Book",
                     author = "New Author",
 
                 )
-                os.mkdr(f"~/.local/share/Bookloom/Books/{book.title}") #update to title then we need a way to switch this if its for windows vs linux
+                os.mkdir(f"~/.local/share/Bookloom/Books/{book.title}") #update to title then we need a way to switch this if its for windows vs linux
+                shutil.move(path, f"~/.local/share/Bookloom/Books/{book.title}/{book.title}.cbz")
                 Signal.emit("import_new_cbz") #prompt user to get name of book and what chapter theyre importing
 
             except Exception as e:
