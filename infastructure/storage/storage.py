@@ -7,4 +7,5 @@ class Base(DeclarativeBase):
 
 # 2. Setup your database engine
 DATABASE_URL = "sqlite:///./test.db"
+
 engine = create_engine(DATABASE_URL, echo=True)
