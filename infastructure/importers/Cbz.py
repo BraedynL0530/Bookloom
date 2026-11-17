@@ -33,12 +33,17 @@ def import_cbz(path, book_id: Optional[str] = None, book_chapter: Optional[int] 
 
         else:
             try:
-                Signal.connect(get_book_data, lambda title, author: (title, author))
-                book = Book(
-                    title = "New Book",
-                    author = "New Author",
+                data=Signal.wait_for_next(30) #should return a tuple of title and author minium, and more if user fills out
+                if data is None:
+                    book = Book(
+                        title="New Book",
+                        author="New Author",
 
-                )
+                    )
+                else:
+                    #TODO
+                    return
+
                 book_path = Path(f"~/.local/share/Bookloom/Books/{book.title}").expanduser()
                 os.mkdir(book_path)
                 shutil.move(path, book_path)
@@ -53,8 +58,3 @@ def import_cbz(path, book_id: Optional[str] = None, book_chapter: Optional[int] 
                 Signal.emit("error", "Please enter book id and chapter number")
 
 
-def get_book_data(title, author):
-    return (
-        title,
-        author,
-    )
