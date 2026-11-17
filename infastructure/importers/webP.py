@@ -6,9 +6,8 @@ from urllib.parse import urljoin
 from playwright.sync_api import sync_playwright
 from PIL import Image
 
-#Go will call this to get concurent downloads!
+#Go will call this to get concurent downloads! MAYBE
 
-#needs to be  title[chapter] for output path in specific folder for db to point at
 def download_chapter_to_cbz(url: str, output_path: str):
 
     print(f"Initializing engine for: {url}")
