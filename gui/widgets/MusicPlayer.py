@@ -3,6 +3,7 @@ from PyQt6.QtGui import QColor, QFont, QIcon, QPixmap
 from PyQt6.QtCore import QTimer, QUrl
 from PyQt6.QtMultimedia import QMediaPlayer, QAudioOutput
 
+#TODO style it, and fix parts
 class MusicPlayer(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)

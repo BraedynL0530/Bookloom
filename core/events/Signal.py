@@ -12,8 +12,12 @@ class Signal:
         self.listners.remove(func)
 
     def emit(self, *args, **kwargs):
-        for func in self.listners:
-            func(*args, **kwargs)
+        event_name = args[0] if args and isinstance(args[0], str) else None
+
+        for func, name_filter in self.listeners:
+            #if the listener registered for a specific name, only call it if it matches
+            if name_filter is None or name_filter == event_name:
+                func(*args, **kwargs)
 
     async def wait_for_next(self, timeout: float = None): #wait untill function is called again or after timeout(thread blocking listener)
         future = asyncio.get_event_loop().create_future()
