@@ -58,7 +58,7 @@ async def import_cbz(path, book_id: Optional[str] = None, book_chapter: Optional
                 shutil.move(path, book_path)
                 Signal.emit("import_new_cbz")
                 session = sessionmaker(bind=engine)()
-                #TODO: addd user prompt to update book info
+                #TODO: addd user prompt to update book info ALSO JUST REALIZED THEYRE GONNA BE IMPORTINF FROM GUI SO PROMPT SHOULD ACTUALLY COME FIRST!
                 with session as s:
                     s.add(book)
                     s.add(chapter)
