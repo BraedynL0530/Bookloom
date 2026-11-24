@@ -33,7 +33,7 @@ async def import_cbz(path, book_id: Optional[str] = None, book_chapter: Optional
 
         else:
             try:
-                data= await Signal.wait_for_next(30) #should return a tuple of title and author minium, and more if user fills out
+                data = await Signal.wait_for_next(30) #should return a tuple of title and author minium, and more if user fills out
                 if data is not None and len(data) >= 2:
                     title, author, *extra = data
                     book = Book(
@@ -45,12 +45,7 @@ async def import_cbz(path, book_id: Optional[str] = None, book_chapter: Optional
                     chapter = Chapter(book_id=book.id, title="Chapter 1", chapter_path=str(Path(path).expanduser()))
 
                 else:
-                    book = Book(
-                        title="New Book",
-                        author="New Author",
-
-                    )
-                    chapter = Chapter(book_id=book.id, title="Chapter 1", chapter_path=str(Path(path).expanduser()))
+                    raise TypeError("Data not provided")
 
 
                 book_path = Path(f"~/.local/share/Bookloom/Books/{book.title}").expanduser()
@@ -64,7 +59,7 @@ async def import_cbz(path, book_id: Optional[str] = None, book_chapter: Optional
                     s.add(chapter)
                     s.commit()
 
-            except Exception as e:
+            except Exception as e: #shouldnt be needed tho
                 print(e)
                 Signal.emit("error", "Please enter book id and chapter number")
 

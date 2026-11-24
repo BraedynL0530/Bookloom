@@ -113,3 +113,8 @@ def save_buffers_to_cbz(buffers: list, output_path: str):
                 cbz.writestr(filename, buf)
             except Exception:
                 cbz.writestr(f"{idx + 1:03d}.jpg", buf)
+
+
+
+
+#TODO: add fanfic importing (as epub) or make a seperate importer(but its related to web importing)

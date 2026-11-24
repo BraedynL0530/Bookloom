@@ -57,11 +57,11 @@ class Upload(QWidget): #this is like a mini page
         invalid_fields = {"", "Required: Upload", "Required: Artist", "Optional Tags", "Optional Description:"}
         meta_data = [item for item in temp_metadata if item not in invalid_fields]
 
-
         data = (
             self.Title,
             self.Author,   
         )
+
         for i in range(len(meta_data)):
             data += (i)
 
