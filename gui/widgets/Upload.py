@@ -39,7 +39,7 @@ class Upload(QWidget): #this is like a mini page
         self.Description.show()
         self.import_button.show() 
 
-        invalid_fields = {"", "Required: Upload", "Required: Artist", "Optional Tags", "Optional Description:"}
+        invalid_fields = {"", "Required: Upload", "Required: Artist", "Optional Tags", "Optional Description:","Invalid Feild"}
 
         for i in range(len(invalid_fields)):
             if self.Title.text() == i:
@@ -54,8 +54,8 @@ class Upload(QWidget): #this is like a mini page
 
     def import_new_cbz(self):
         temp_metadata = [self.Description, self.Tags]
-        invalid_fields = {"", "Required: Upload", "Required: Artist", "Optional Tags", "Optional Description:"}
-        meta_data = [item for item in temp_metadata if item not in invalid_fields]
+        invalid_fields = {"", "Required: Upload", "Required: Artist", "Optional Tags", "Optional Description:","Invalid Feild"}
+        meta_data =[item for item in temp_metadata if not invalid_fields] #just heard no ai coding! ill fix that rn
 
         data = (
             self.Title,
