@@ -1,6 +1,7 @@
 from PyQt6.QtWidgets import QWidget, QFileDialog, QPushButton, QDialog, QLabel, QLineEdit
 from core.events import Signal
 
+#TODO: layout
 class Upload(QWidget): #this is like a mini page
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -19,36 +20,49 @@ class Upload(QWidget): #this is like a mini page
         self.Tags.hide()
         self.Description.hide()
         self.import_button.hide()
+        self.import_button.connect(self.import_new_cbz)
 
     def open_file_dialog(self) -> str | None:
         dialog = QFileDialog(self)
         dialog.setNameFilter("Books (*.epub *.cbz)")  # may add more support in future
 
         if dialog.exec() == QDialog.DialogCode.Accepted:
-            self.import_new_cbz()
+            self.start_import()
             return dialog.selectedFiles()
 
 
-    def import_new_cbz(self): 
+    def start_import(self): 
         self.upload_button.hide()
         self.Title.show()
         self.Author.show()
         self.Tags.show()
         self.Description.show()
-        self.import_button.show() # im thinking list comprehension for non needed feilds
+        self.import_button.show() 
 
-        invalid_Feilds = ["", "Required: Upload", "Required: Artist"]
-        for i in range(invalid_Feilds):
+        invalid_fields = {"", "Required: Upload", "Required: Artist", "Optional Tags", "Optional Description:"}
+
+        for i in range(len(invalid_fields)):
             if self.Title.text() == i:
                 self.Title.setText("Invalid Feild")
-            if self.Author.text() == i:
-                self.Author.setText("Invalid Feild")
-
-        
-
-        return self.Title.text(), self.Author.text()
-
-    #GAHHHHHHHHHH 
+                self.import_button.setEnabled(False)
+            elif self.Author.text() == i:
+                self.import_button.setText("Invalid Feild")
+                self.Author.setEnabled(False)
+            else:
+                self.import_button.setEnabled(True)
 
 
-    #Alr im done for today i coded early and its a sunday
+    def import_new_cbz(self):
+        temp_metadata = [self.Description, self.Tags]
+        invalid_fields = {"", "Required: Upload", "Required: Artist", "Optional Tags", "Optional Description:"}
+        meta_data = [item for item in temp_metadata if item not in invalid_fields]
+
+
+        data = (
+            self.Title,
+            self.Author,   
+        )
+        for i in range(len(meta_data)):
+            data += (i)
+
+        return data
