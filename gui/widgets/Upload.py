@@ -1,5 +1,5 @@
 from PyQt6.QtWidgets import QWidget, QFileDialog, QPushButton, QDialog, QLabel, QLineEdit
-from core.events import Signal
+from core.events.Signal import Signal
 
 #TODO: layout
 class Upload(QWidget): #this is like a mini page
