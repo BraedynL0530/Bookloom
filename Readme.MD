@@ -18,7 +18,7 @@ but im unsure as of now whast going to construct %LocalAPPDATA%/Bookloom
 
 # TODO: 
 * ~~finish cbz importer~~
-* ~~work on gui~~ (Wip)
+* ~~work on gui~~ (Wip) NOTE: gotta do layout!!!!!!!!
 * begin epub importer
 * finsh web importer
 * work on browser interface(with pre set ways to view)
