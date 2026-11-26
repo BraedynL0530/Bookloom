@@ -9,9 +9,10 @@ class Bookshelf(Base):
     __tablename__ = "bookshelves"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    books_per_row: Mapped[int] = mapped_column(Integer, default=10)
+
+    books_per_row: Mapped[int] = mapped_column(Integer, default=8)
     order: Mapped[Optional[str]] = mapped_column(String(50), nullable=True)
-    current_rows: Mapped[int] = mapped_column(Integer, default=1)
+    current_rows: Mapped[int] = mapped_column(Integer, default=1) #Note: may remove from database!
 
     books: Mapped[list[str]] = mapped_column(JSON, default=list)
     favorite: Mapped[list[str]] = mapped_column(JSON, default=list)
