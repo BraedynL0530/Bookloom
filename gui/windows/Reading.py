@@ -3,6 +3,8 @@ from PyQt6.QtWidgets import QWidget, QPushButton, QLabel, QHBoxLayout, QVBoxLayo
 from sqlalchemy import select
 from infastructure.storage.storage import engine
 from sqlalchemy.orm import sessionmaker
+from ebooklib import epub #dependencys hell yeah!
+from core.classes.Chapters import Chapter
 
 class Reader(QWidget):
     def __init__(self, parent = None):
@@ -34,6 +36,14 @@ class Reader(QWidget):
 
 
         def read_local_chapter(self, id:str) -> None:
+            session = sessionmaker(bind=engine)()
+            stmt = select(Chapter).where(Chapter.id==id)
+            with session:
+                chapter = session.scalars(stmt)
+            path = chapter.chapter_path
+            self.book = epub.read_epub(path) #yay yay yay
+            #now to actually get the data...
+            
 
 
             self.container.addWidget(self.nav)
@@ -44,5 +54,7 @@ class Reader(QWidget):
 
             self.container.addWidget(self.nav)
             pass
+
+#GAHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH
 
 

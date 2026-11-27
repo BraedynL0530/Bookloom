@@ -26,3 +26,4 @@ but im unsure as of now whast going to construct %LocalAPPDATA%/Bookloom
 * chibi design
 * TV functionality
 * lan(interchangeable with 2 avoce)
+* Steal a repos i saw TTS/narration (+highlight line) feature :3c 
