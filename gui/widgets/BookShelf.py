@@ -6,6 +6,8 @@ from sqlalchemy import select
 from core.classes.Bookshelf import Bookshelf
 from core.classes.Book import Book
 import random
+from gui.widgets.Upload import Upload
+
 class BookShelfObject(QWidget):
     def __init__(self, parent = None):
         super().__init__(parent)
@@ -22,6 +24,13 @@ class BookShelfObject(QWidget):
 
         self.rows = None
         self.books_per_row = 8 #random values idc
+
+
+        self.add_new_book = QPushButton("+")# use icon in future
+        self.add_new_book.clicked.connect(self.upload.show)
+
+        self.upload = Upload
+        self.upload.hide()
 
         self.create_object()
         self.init_ui()

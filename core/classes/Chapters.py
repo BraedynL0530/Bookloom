@@ -13,3 +13,6 @@ class Chapter(Base):
     book_id: Mapped[str] = mapped_column(ForeignKey("books.id", ondelete="CASCADE"), nullable=False)
     book: Mapped["Book"] = relationship(back_populates="chapters")
     chapter_path: Mapped[str] = mapped_column(String(500), nullable=False)
+
+
+    #TODO: figure out how to have it save browser based 

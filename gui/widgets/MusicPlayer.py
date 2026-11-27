@@ -7,7 +7,7 @@ from PyQt6.QtMultimedia import QMediaPlayer, QAudioOutput
 class MusicPlayer(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.pause_play = QPushButton('Paused')#emojis later!
+        self.pause_play = QPushButton('Paused')#emojis later! QICON
         self.skip = QPushButton('->')
         self.previous = QPushButton("<-")
         self.pause_play.clicked.connect(self.play_pause)

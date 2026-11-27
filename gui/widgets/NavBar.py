@@ -4,8 +4,8 @@ from core.events.Signal import Signal
 
 #should be in main window only.
 class NavBar(QWidget):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, parent = None):
+        super().__init__(parent)
 
         self.drop_down = QPushButton()
 

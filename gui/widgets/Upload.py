@@ -66,3 +66,5 @@ class Upload(QWidget): #this is like a mini page
             data += (i)
 
         return data
+
+    #TODO: add hide function and reset after its sent via signal
