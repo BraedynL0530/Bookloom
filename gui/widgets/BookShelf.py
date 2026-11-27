@@ -69,6 +69,7 @@ class BookShelfObject(QWidget):
                     "chapterCount":book.chapter_count,
                     "currentChapter":book.current_chapter,
                     "lastViewed":book.last_viewed,
+                    "coverImg": book.cover_img_path
                 })
 
             #for favorite in shelf.favorite: #trying not to have 2 diffrent for loops but this should loop over favorites and append the title, worse case ill just append book.id but title would be nice
@@ -88,11 +89,17 @@ class BookShelfObject(QWidget):
         
 
 
-    def book_info(self, id:str): #alr know what this cshould do just want a way to kill this specific function or something like that
+    def book_info(self, id:str) -> QWidget: #alr know what this should do just want a way to kill this specific function or something like that
         for book in self.books:
             if id == book["id"]:
-                pass #make popup here
-        
+                title = QLabel(book["title"]) #should be big
+                img = QIcon(book["coverImg"])# QICON is temp unless this is proper method!
+                chap = QLabel(f"ch.{book['currentChapter']}/{book['chapterCount']}")
+                #should add statuses like Reading, and Comleted to DB
+                last_read = QLabel("last read" + book["lastViewed"])#make this is a date or check db and used lastviewed days ago or something
+                description = QLabel(book["desc"])#big little textarea like or atleast style wise i dont want it editable.
+                read = QPushButton(f"Read chapter {book['currentChapter']}")
 
-
-            #home lab planning break!
+                for chapter in book.chapters:#ts was proper 
+                    btn = QPushButton(chapter.title)
+                    #botton should connect to reading.

@@ -2,6 +2,7 @@ import uuid
 from sqlalchemy import String, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from infastructure.storage.storage import Base
+from core.classes.Book import Book
 
 
 class Chapter(Base):

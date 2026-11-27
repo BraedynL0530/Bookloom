@@ -5,6 +5,7 @@ from sqlalchemy import String, JSON, DateTime
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from infastructure.storage.storage import Base
 from core.events.Signal import Signal
+from core.classes.Chapters import Chapter
 
 class Book(Base):
     __tablename__ = "books"
