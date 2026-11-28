@@ -27,3 +27,15 @@ but im unsure as of now whast going to construct %LocalAPPDATA%/Bookloom
 * TV functionality
 * lan(interchangeable with 2 avoce)
 * Steal a repos i saw TTS/narration (+highlight line) feature :3c 
+
+
+
+#webviewer feature:
+use playwrigt or beutifal soup
+
+what it needs:
+* a way to check for every chapter
+* a way to tell what images are actual content and not ads
+* for cbz(intended use for browser but may add epub in future) have a view preset urls that it supports
+* then use a second request while user is loading first chapter to see if a next chapter exist(determines if button is useable)
+* redis? to have a llike cache of previous chapters in web.

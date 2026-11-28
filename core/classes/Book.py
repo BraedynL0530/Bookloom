@@ -17,7 +17,7 @@ class Book(Base):
     source: Mapped[str] = mapped_column(String(50), default="")  # web or local
     chapter_count: Mapped[int] = mapped_column(default=0)
     chapter_name: Mapped[str] = mapped_column(String(255), default="")#NOTE: i dont think this is needed! would priobally be better inside of chapters
-    current_chapter: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    current_chapter: Mapped[Optional[str]] = mapped_column(String(255), nullable=True) #NOTE: current chapter = current page 4 epub if possible
     last_viewed: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
     cover_img_path: Mapped[Optional[str]] = mapped_column(String(500), nullable=True)
 
