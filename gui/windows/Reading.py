@@ -19,17 +19,21 @@ class Reader(QWidget):
 
 
         self.container = QVBoxLayout()
+
         self.doc = None
+        self.doc_type = None
+        self.doc_type = self.get_doc_type()
+
+        
         self.page_idx = 0
         self.theme = "beige"
+
 
         self.pages = QHBoxLayout
         self.left_page = QLabel()
         self.right_page = QLabel()
-
         self.pages.addWidget(self.left_page)
         self.pages.addWidget(self.right_page)
-
 
         self.container.addWidget(self.pages)
 
@@ -37,22 +41,15 @@ class Reader(QWidget):
         self.corners = QHBoxLayout()
         self.left_num = QLabel(alignment=Qt.AlignmentFlag.AlignLeft)
         self.right_num = QLabel(alignment=Qt.AlignmentFlag.AlignRight)
-
         self.corners.addWidget(self.left_num)
         self.corners.addWidget(self.right_num)
         self.container.addWidget(self.corners)
         
-
-
-
-
         self.nav = QHBoxLayout()
 
         self.next = QPushButton("->")# icons later
         self.chapter = QLabel("temp: chapter 11/24")
         self.previous = QPushButton("<-")
-
-        
         self.nav.addWidget(self.previous)
         self.nav.addWidget(self.chapter)
         self.nav.addWidget(self.next)
@@ -61,7 +58,22 @@ class Reader(QWidget):
 
 
         
+        def get_doc_type(self) -> str:
+            session = sessionmaker(bind=engine)()
+            stmt = select(Chapter).where(Chapter.id==id)
 
+            with session:
+                chapter = session.scalars(stmt)
+
+            if chapter.chapter_path.endswith(".cbz"):
+                return "cbz"
+            if chapter.chapter_path.endswith(".epub"):
+                            return "epub"
+            else:
+                 raise ValueError("Unexpected file type")
+
+            
+            
 
         #TODO:
         #NEEDS:
@@ -80,7 +92,7 @@ class Reader(QWidget):
             #now to actually get the data...
 
 
-        def render_page(self, index:int) ->QPixmap: #gemni helped here because idk this lib nor how epubs work but no ai code? or ai didnt do it for me.
+        def render_book_page(self, index:int) ->QPixmap: #gemni helped here because idk this lib nor how epubs work but no ai code? or ai didnt do it for me.
             if not self.doc or index < 0:
                 return QPixmap() #so empty pages can exist/not break render
 
@@ -93,8 +105,8 @@ class Reader(QWidget):
             return qpix
 
         def render_spread(self, index:int): 
-            self.left_page.setPixmap(self.render_page(index))
-            self.left_page.setPixmap(self.render_page(index+1))
+            self.left_page.setPixmap(self.render_book_page(index))
+            self.left_page.setPixmap(self.render_book_page(index+1))
 
             self.left_num.setText(str(index+1))
             self.left_num.setText(
@@ -102,8 +114,16 @@ class Reader(QWidget):
             )
 
 
-        def turn_page():
-            pass
+        def turn_page(self, steps:int):
+            if not self.doc:
+                 return
+            
+            if self.doc_type == "epub" :
+                 new_index += steps
+                 if self.index > 0:
+                    self.page_index = new_index
+                    self.render_spread(self.page_index) #this is broken but im tired, tahts all for TN!
+                 
 
 
         def read_local_epub(self, id:str) -> None:  #heh, ill take it from here gemni
@@ -118,7 +138,8 @@ class Reader(QWidget):
             if chapter.current_page:
                 self.page_idx = chapter.current_page - 1
 
-            self.doc = pymupdf(path)#idk yet ignore this
+            self.doc = pymupdf.open(path)
+            self.render_spread(self.page_index)
             
             
 
@@ -128,3 +149,4 @@ class Reader(QWidget):
 
 
 
+#whoops
